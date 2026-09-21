@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>真·格價王 v6 - 重整排版版</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+html,body{margin:0;padding:0;width:100%;overflow-x:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang HK","Microsoft JhengHei",sans-serif;background:#FFFEF7}
+*{box-sizing:border-box}
+.scrollbar-hide::-webkit-scrollbar{display:none}
+@media (max-width:768px){
+  .desktop-only{display:none !important}
+}
+@media (min-width:769px){
+  .mobile-only{display:none !important}
+}
+</style>
+<script type="importmap">{"imports":{"firebase/app":"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js","firebase/firestore":"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"}}</script>
+</head>
+<body class="min-h-screen">
+
+<!-- HEADER - FIXED 56px -->
+<div class="sticky top-0 z-40 bg-white border-b border-neutral-200">
+  <div class="h-[56px] flex items-center justify-between px-4 max-w-[1280px] mx-auto">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center font-black text-[13px]">格</div>
+      <div>
+        <div class="font-black text-[15px] leading-[15px]">真·格價王</div>
+        <div class="text-[10px] text-neutral-500 leading-[10px] mt-1">v6 重整排版 · 手機電腦通用</div>
+      </div>
+    </div>
+    <div id="syncBadge" class="text-[11px] px-3 py-1.5 rounded-full bg-neutral-100 border font-medium">連接中...</div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT - CSS GRID REBUILD -->
+<div class="max-w-[1280px] mx-auto w-full">
+  <div class="flex flex-col md:flex-row md:items-start md:gap-6 p-3 md:p-6 gap-4">
+
+    <!-- LEFT PANEL - 380px desktop, 100% mobile -->
+    <div class="w-full md:w-[380px] md:shrink-0 md:sticky md:top-[72px] space-y-4 order-1">
+
+      <!-- ADD FORM CARD -->
+      <div class="bg-white rounded-[20px] border border-neutral-200 p-4 shadow-sm">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-full bg-[#FFCA28] flex items-center justify-center font-bold text-[12px]">+</div>
+          <div class="font-bold text-[14px]">新增格價</div>
+          <div class="ml-auto text-[10px] bg-green-50 text-green-700 border border-green-200 px-2 py-1 rounded-full">自動同步</div>
+        </div>
+
+        <!-- Product Name -->
+        <div class="mb-3">
+          <input id="productName" placeholder="產品名 例如：雀巢淡奶 410ml" class="w-full h-[48px] rounded-[12px] border border-neutral-200 px-4 text-[14px] focus:outline-none focus:border-black focus:ring-2 focus:ring-black/10">
+        </div>
+
+        <!-- Category + Shop ROW -->
+        <div class="grid grid-cols-2 gap-2 mb-3">
+          <select id="category" class="h-[48px] rounded-[12px] border border-neutral-200 px-3 text-[13px] bg-white focus:outline-none focus:border-black">
+            <option value="">🏷️ 種類</option>
+            <option value="飲品">🥤 飲品</option><option value="奶類">🥛 奶類</option><option value="罐頭醬料">🥫 罐頭醬料</option><option value="米麵粉">🍚 米麵粉</option><option value="零食">🍪 零食</option><option value="調味料">🧂 調味料</option><option value="冷凍">❄️ 冷凍</option><option value="清潔日用">🧴 清潔日用</option><option value="其他">📦 其他</option>
+          </select>
+          <select id="shop" class="h-[48px] rounded-[12px] border border-neutral-200 px-3 text-[13px] bg-white focus:outline-none focus:border-black">
+            <option>惠康</option><option>百佳</option><option>佳寶</option><option>759</option><option>Donki</option><option>HKTVmall</option><option>其他</option>
+          </select>
+        </div>
+
+        <!-- Price + Weight + Unit ROW -->
+        <div class="grid grid-cols-3 gap-2 mb-3">
+          <input id="price" type="number" inputmode="decimal" placeholder="價錢 $" class="h-[48px] rounded-[12px] border border-neutral-200 px-4 text-[14px] focus:outline-none focus:border-black">
+          <input id="weight" type="number" inputmode="decimal" placeholder="重量" class="h-[48px] rounded-[12px] border border-neutral-200 px-3 text-[13px] focus:outline-none focus:border-black">
+          <select id="unit" class="h-[48px] rounded-[12px] border border-neutral-200 px-2 text-[13px] bg-white focus:outline-none focus:border-black"><option value="g">g</option><option value="kg">kg</option><option value="ml" selected>ml</option><option value="L">L</option><option value="件">件</option><option value="磅">磅</option><option value="斤">斤</option></select>
+        </div>
+
+        <!-- 3 PHOTOS GRID - COMPLETELY REBUILT -->
+        <div class="grid grid-cols-3 gap-2 mb-4">
+          <!-- Photo 1 -->
+          <div class="relative">
+            <label for="file1" class="block aspect-square rounded-[14px] border-2 border-dashed border-neutral-200 bg-neutral-50 hover:border-black hover:bg-white cursor-pointer transition-all overflow-hidden">
+              <div id="ph1_empty" class="w-full h-full flex flex-col items-center justify-center gap-1.5">
+                <i class="fa-solid fa-box-open text-neutral-400 text-[18px]"></i>
+                <span class="text-[11px] text-neutral-600 font-medium">貨品</span>
+              </div>
+              <img id="preview1" class="hidden absolute inset-0 w-full h-full object-cover">
+            </label>
+            <input id="file1" type="file" accept="image/*" capture="environment" class="hidden">
+            <button id="remove1" class="hidden absolute top-1 right-1 w-6 h-6 bg-black text-white rounded-full text-[12px] items-center justify-center">×</button>
+          </div>
+          <!-- Photo 2 -->
+          <div class="relative">
+            <label for="file2" class="block aspect-square rounded-[14px] border-2 border-dashed border-neutral-200 bg-neutral-50 hover:border-black hover:bg-white cursor-pointer transition-all overflow-hidden">
+              <div id="ph2_empty" class="w-full h-full flex flex-col items-center justify-center gap-1.5">
+                <i class="fa-solid fa-tag text-neutral-400 text-[18px]"></i>
+                <span class="text-[11px] text-neutral-600 font-medium">價錢牌</span>
+              </div>
+              <img id="preview2" class="hidden absolute inset-0 w-full h-full object-cover">
+            </label>
+            <input id="file2" type="file" accept="image/*" capture="environment" class="hidden">
+            <button id="remove2" class="hidden absolute top-1 right-1 w-6 h-6 bg-black text-white rounded-full text-[12px] items-center justify-center">×</button>
+          </div>
+          <!-- Photo 3 -->
+          <div class="relative">
+            <label for="file3" class="block aspect-square rounded-[14px] border-2 border-dashed border-orange-200 bg-orange-50 hover:border-orange-400 cursor-pointer transition-all overflow-hidden">
+              <div id="ph3_empty" class="w-full h-full flex flex-col items-center justify-center gap-1.5">
+                <i class="fa-solid fa-clipboard-list text-orange-400 text-[18px]"></i>
+                <span class="text-[11px] text-orange-700 font-medium">食物標籤</span>
+              </div>
+              <img id="preview3" class="hidden absolute inset-0 w-full h-full object-cover">
+            </label>
+            <input id="file3" type="file" accept="image/*" capture="environment" class="hidden">
+            <button id="remove3" class="hidden absolute top-1 right-1 w-6 h-6 bg-black text-white rounded-full text-[12px] items-center justify-center">×</button>
+          </div>
+        </div>
+
+        <button id="addBtn" class="w-full h-[50px] rounded-[14px] bg-black text-white font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[0.98] transition"><i class="fa-solid fa-plus"></i> 儲存格價</button>
+        <div class="text-[10px] text-neutral-400 text-center mt-2">點擊相片放大 · 黃色🔁一鍵再記 · 自動壓縮</div>
+      </div>
+
+      <!-- Chart -->
+      <div class="bg-black text-white rounded-[20px] p-4">
+        <div class="flex justify-between items-center mb-2"><span class="text-[12px] font-bold">💹 走勢</span><span id="chartLabel" class="text-[10px] bg-white/10 px-2 py-1 rounded-full">$/100g</span></div>
+        <canvas id="chart" height="160" class="w-full"></canvas>
+        <div id="chartEmpty" class="h-[160px] flex items-center justify-center text-white/40 text-[11px]">未有數據</div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL - LIST -->
+    <div class="w-full flex-1 min-w-0 order-2">
+      <!-- Filters -->
+      <div class="bg-white rounded-[14px] border border-neutral-200 p-2 mb-3 flex gap-2 overflow-x-auto scrollbar-hide">
+        <div class="relative shrink-0">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[11px]"></i>
+          <input id="search" placeholder="搜產品" class="h-[36px] w-[130px] md:w-[180px] rounded-full bg-neutral-50 border border-neutral-200 pl-8 pr-3 text-[13px] focus:outline-none focus:bg-white focus:border-black">
+        </div>
+        <select id="filterCategory" class="h-[36px] rounded-full bg-neutral-50 border border-neutral-200 px-3 text-[12px] shrink-0"><option value="">全部種類</option><option value="飲品">飲品</option><option value="奶類">奶類</option><option value="罐頭醬料">罐頭</option><option value="米麵粉">米麵</option><option value="零食">零食</option><option value="調味料">調味</option><option value="冷凍">冷凍</option><option value="清潔日用">清潔</option><option value="其他">其他</option></select>
+        <select id="filterShop" class="h-[36px] rounded-full bg-neutral-50 border border-neutral-200 px-3 text-[12px] shrink-0"><option value="">全部店</option><option>惠康</option><option>百佳</option><option>佳寶</option><option>759</option><option>Donki</option><option>HKTVmall</option></select>
+        <select id="sortBy" class="h-[36px] rounded-full bg-neutral-50 border border-neutral-200 px-3 text-[12px] shrink-0"><option value="new">最新</option><option value="cheap">最平</option><option value="expensive">最貴</option></select>
+      </div>
+
+      <div id="list" class="grid grid-cols-1 lg:grid-cols-2 gap-3"></div>
+      <div id="empty" class="bg-white rounded-[20px] border border-dashed border-neutral-200 py-16 text-center mt-3">
+        <div class="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-3 text-neutral-300"><i class="fa-solid fa-camera text-[18px]"></i></div>
+        <div class="text-[13px] text-neutral-500 font-medium">未有紀錄</div>
+        <div class="text-[11px] text-neutral-400 mt-1">影張相開始格價啦</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FAB Mobile -->
+<button id="fab" class="md:hidden fixed bottom-5 right-5 w-14 h-14 rounded-full bg-black text-white shadow-xl flex items-center justify-center text-[20px] z-30"><i class="fa-solid fa-plus"></i></button>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" class="fixed inset-0 z-[100] hidden bg-black">
+  <div class="w-full h-full flex items-center justify-center p-4"><img id="lbImg" class="max-w-full max-h-full object-contain" style="max-width:92vw; max-height:85vh"></div>
+  <button id="lbClose" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center">×</button>
+  <button id="lbPrev" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center"><i class="fa-solid fa-chevron-left text-[12px]"></i></button>
+  <button id="lbNext" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center"><i class="fa-solid fa-chevron-right text-[12px]"></i></button>
+  <div id="lbLabel" class="absolute top-4 left-4 bg-white/10 text-white text-[11px] px-3 py-1.5 rounded-full">貨品相</div>
+  <div id="lbDots" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5"></div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="fixed inset-0 z-[90] hidden bg-black/50 p-4 flex items-center justify-center">
+  <div class="bg-white w-full max-w-[480px] rounded-[20px] p-5 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-4"><span class="font-bold text-[15px]">✏️ 編輯格價</span><button id="editClose" class="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center">×</button></div>
+    <div class="space-y-3">
+      <input id="editName" class="w-full h-[46px] rounded-[12px] border border-neutral-200 px-4 text-[14px]">
+      <div class="grid grid-cols-2 gap-2"><select id="editCategory" class="h-[46px] rounded-[12px] border px-3 text-[13px] bg-white"><option value="">種類</option><option value="飲品">飲品</option><option value="奶類">奶類</option><option value="罐頭醬料">罐頭醬料</option><option value="米麵粉">米麵粉</option><option value="零食">零食</option><option value="調味料">調味料</option><option value="冷凍">冷凍</option><option value="清潔日用">清潔日用</option><option value="其他">其他</option></select><select id="editShop" class="h-[46px] rounded-[12px] border px-3 text-[13px] bg-white"><option>惠康</option><option>百佳</option><option>佳寶</option><option>759</option><option>Donki</option><option>HKTVmall</option><option>其他</option></select></div>
+      <div class="grid grid-cols-3 gap-2"><input id="editPrice" type="number" placeholder="價錢" class="h-[46px] rounded-[12px] border px-3 text-[13px]"><input id="editWeight" type="number" placeholder="重量" class="h-[46px] rounded-[12px] border px-3 text-[13px]"><select id="editUnit" class="h-[46px] rounded-[12px] border px-2 text-[13px] bg-white"><option value="g">g</option><option value="kg">kg</option><option value="ml">ml</option><option value="L">L</option><option value="件">件</option><option value="磅">磅</option><option value="斤">斤</option></select></div>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="relative aspect-square rounded-[12px] overflow-hidden bg-neutral-100 border"><img id="editPreview1" class="w-full h-full object-cover"><label class="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-2 py-1 rounded-full cursor-pointer">更換<input id="editFile1" type="file" accept="image/*" class="hidden"></label><button id="editRemove1" class="absolute top-1 right-1 w-5 h-5 bg-black/70 text-white rounded-full text-[10px]">×</button></div>
+        <div class="relative aspect-square rounded-[12px] overflow-hidden bg-neutral-100 border"><img id="editPreview2" class="w-full h-full object-cover"><label class="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-2 py-1 rounded-full cursor-pointer">更換<input id="editFile2" type="file" accept="image/*" class="hidden"></label><button id="editRemove2" class="absolute top-1 right-1 w-5 h-5 bg-black/70 text-white rounded-full text-[10px]">×</button></div>
+        <div class="relative aspect-square rounded-[12px] overflow-hidden bg-orange-50 border border-orange-200"><img id="editPreview3" class="w-full h-full object-cover"><label class="absolute bottom-1 left-1/2 -translate-x-1/2 bg-orange-600 text-white text-[9px] px-2 py-1 rounded-full cursor-pointer">更換<input id="editFile3" type="file" accept="image/*" class="hidden"></label><button id="editRemove3" class="absolute top-1 right-1 w-5 h-5 bg-black/70 text-white rounded-full text-[10px]">×</button></div>
+      </div>
+      <button id="editSave" class="w-full h-[48px] rounded-[12px] bg-black text-white font-bold">儲存修改</button>
+      <button id="editDelete" class="w-full h-[44px] rounded-[12px] border border-red-200 text-red-600 text-[13px]">🗑️ 刪除</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-black text-white text-[12px] px-5 py-2.5 rounded-full hidden z-[110] shadow-xl"></div>
+
+<script type="module">
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore';
+const firebaseConfig = { apiKey: "AIzaSyDL9NrgQBYWqYhm2GF0_yBm6cyMJAEsEaM", authDomain: "hk-price.firebaseapp.com", projectId: "hk-price", storageBucket: "hk-price.firebasestorage.app", messagingSenderId: "798199927547", appId: "1:798199927547:web:28207610c68a1ab465d65e" };
+let db, items=[]; let editingId=null; let temp={b64_1:null,b64_2:null,b64_3:null}; let editTemp={b64_1:null,b64_2:null,b64_3:null}; let lb={images:[],labels:[],index:0};
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),2400); }
+function toG(w,u){ w=parseFloat(w)||1; if(u==='kg')return w*1000; if(u==='L')return w*1000; if(u==='磅')return w*454; if(u==='斤')return w*605; if(u==='件')return 1; return w; }
+function per100(p,w,u){ return (p/(toG(w,u)||1))*100; }
+function compress(f){ return new Promise(r=>{ const rd=new FileReader(); rd.onload=e=>{ const im=new Image(); im.onload=()=>{ let W=im.width,H=im.height; if(W>800){ H=H*800/W; W=800; } const c=document.createElement('canvas'); c.width=W; c.height=H; c.getContext('2d').drawImage(im,0,0,W,H); r(c.toDataURL('image/jpeg',0.6)); }; im.src=e.target.result; }; rd.readAsDataURL(f); }); }
+try{ const app=initializeApp(firebaseConfig); db=getFirestore(app); const q=query(collection(db,'prices'), orderBy('created_at','desc')); onSnapshot(q, s=>{ items=s.docs.map(d=>({id:d.id,...d.data()})); document.getElementById('syncBadge').innerHTML=`✅ 已連動 (${items.length})`; document.getElementById('syncBadge').className='text-[11px] px-3 py-1.5 rounded-full bg-green-50 border border-green-200 text-green-700 font-medium'; render(); }, err=>{ document.getElementById('syncBadge').textContent='❌ 規則未開放'; }); }catch(e){ document.getElementById('syncBadge').textContent='📴 本機模式'; }
+
+function render(){
+  const s=document.getElementById('search').value.toLowerCase();
+  const catF=document.getElementById('filterCategory').value;
+  const shopF=document.getElementById('filterShop').value;
+  const sort=document.getElementById('sortBy').value;
+  let f=items.filter(it=>{
+    if(s&&!it.product_name?.toLowerCase().includes(s)) return false;
+    if(catF&&it.category!==catF) return false;
+    if(shopF&&it.shop!==shopF) return false;
+    return true;
+  });
+  if(sort==='cheap')f.sort((a,b)=>(a.price_per_100g||999)-(b.price_per_100g||999));
+  if(sort==='expensive')f.sort((a,b)=>(b.price_per_100g||0)-(a.price_per_100g||0));
+  const list=document.getElementById('list'); const emp=document.getElementById('empty');
+  if(!f.length){ list.innerHTML=''; emp.classList.remove('hidden'); drawChart([]); return; }
+  emp.classList.add('hidden');
+  list.innerHTML=f.map(it=>{
+    const p=it.price_per_100g||per100(it.price,it.weight,it.unit);
+    const isV=it.unit==='ml'||it.unit==='L'; const lbl=isV?'/100ml':'/100g';
+    const catIcon={'飲品':'🥤','奶類':'🥛','罐頭醬料':'🥫','米麵粉':'🍚','零食':'🍪','調味料':'🧂','冷凍':'❄️','清潔日用':'🧴','其他':'📦'}[it.category]||'🏷️';
+    const shopColor={'惠康':'bg-[#00A651]','百佳':'bg-[#E30613]','佳寶':'bg-[#FFD400] text-black','759':'bg-black','Donki':'bg-[#E60012]','HKTVmall':'bg-[#FF6600]'}[it.shop]||'bg-neutral-800';
+    return `<div class="bg-white rounded-[16px] border border-neutral-200 p-3 flex gap-3">
+      <div class="shrink-0 flex gap-1">
+        ${it.image1?`<img src="${it.image1}" data-full="${it.image1}" data-group="${it.id}" class="w-[56px] h-[56px] rounded-[10px] object-cover border cursor-pointer photo">`:`<div class="w-[56px] h-[56px] rounded-[10px] bg-neutral-100 flex items-center justify-center text-neutral-300"><i class="fa-solid fa-image"></i></div>`}
+        <div class="flex flex-col gap-1">
+          ${it.image2?`<img src="${it.image2}" data-full="${it.image2}" data-group="${it.id}" class="w-[22px] h-[26px] rounded-[6px] object-cover border cursor-pointer photo">`:`<div class="w-[22px] h-[26px] rounded-[6px] bg-neutral-50 border border-dashed"></div>`}
+          ${it.image3?`<img src="${it.image3}" data-full="${it.image3}" data-group="${it.id}" class="w-[22px] h-[26px] rounded-[6px] object-cover border-2 border-orange-200 cursor-pointer photo">`:`<div class="w-[22px] h-[26px] rounded-[6px] bg-orange-50 border border-dashed border-orange-200"></div>`}
+        </div>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-start justify-between gap-2">
+          <div class="font-bold text-[13px] truncate">${it.product_name||'未命名'}</div>
+          <div class="flex gap-1 shrink-0">
+            <button data-clone="${it.id}" class="cloneBtn w-7 h-7 rounded-full bg-[#FFCA28] border flex items-center justify-center"><i class="fa-solid fa-copy text-[10px]"></i></button>
+            <button data-edit="${it.id}" class="editBtn w-7 h-7 rounded-full bg-neutral-50 border flex items-center justify-center"><i class="fa-solid fa-pen text-[10px]"></i></button>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-1 mt-1">
+          ${it.category?`<span class="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 border">${catIcon} ${it.category}</span>`:''}
+          <span class="text-[10px] px-2 py-0.5 rounded-full text-white ${shopColor}">${it.shop||'其他'}</span>
+          <span class="text-[10px] text-neutral-500">${it.weight||''}${it.unit||''}</span>
+        </div>
+        <div class="flex justify-between items-end mt-2">
+          <span class="font-black text-[16px]">$${Number(it.price).toFixed(2)}</span>
+          <span class="text-[11px] font-bold">$${p.toFixed(2)}${lbl}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.editBtn').forEach(b=>b.addEventListener('click', e=>openEdit(e.currentTarget.dataset.edit)));
+  document.querySelectorAll('.cloneBtn').forEach(b=>b.addEventListener('click', e=>cloneItem(e.currentTarget.dataset.clone)));
+  document.querySelectorAll('.photo').forEach(im=>im.addEventListener('click', e=>openLb(e.currentTarget.dataset.full, e.currentTarget.dataset.group)));
+  drawChart(f.slice(0,15).reverse());
+}
+
+function drawChart(data){
+  const canvas=document.getElementById('chart'); const empty=document.getElementById('chartEmpty');
+  if(!data.length){ canvas.classList.add('hidden'); empty.classList.remove('hidden'); return; }
+  canvas.classList.remove('hidden'); empty.classList.add('hidden');
+  const ctx=canvas.getContext('2d'); const w=canvas.width=canvas.offsetWidth*2; const h=canvas.height=160*2; ctx.clearRect(0,0,w,h);
+  const vals=data.map(d=>d.price_per_100g!=null?d.price_per_100g:per100(d.price,d.weight,d.unit)).filter(v=>isFinite(v)); if(!vals.length)return;
+  const min=Math.min(...vals)*0.85, max=Math.max(...vals)*1.15||10; const range=max-min||1;
+  ctx.strokeStyle='rgba(255,255,255,0.1)'; for(let i=0;i<4;i++){ const y=10+i/3*(h-20); ctx.beginPath(); ctx.moveTo(60,y); ctx.lineTo(w-10,y); ctx.stroke(); }
+  ctx.strokeStyle='#00C853'; ctx.lineWidth=4; ctx.beginPath(); data.forEach((d,i)=>{ const v=vals[i]; const x=60+i/(data.length-1||1)*(w-70); const y=10+(1-(v-min)/range)*(h-20); if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke();
+}
+
+function cloneItem(id){
+  const it=items.find(x=>x.id===id); if(!it)return;
+  document.getElementById('productName').value=it.product_name||'';
+  document.getElementById('category').value=it.category||'';
+  document.getElementById('weight').value=it.weight||'';
+  document.getElementById('unit').value=it.unit||'g';
+  document.getElementById('shop').value=it.shop||'其他';
+  document.getElementById('price').value='';
+  temp={b64_1:it.image1||null, b64_2:it.image2||null, b64_3:it.image3||null};
+  if(temp.b64_1){ document.getElementById('preview1').src=temp.b64_1; document.getElementById('preview1').classList.remove('hidden'); document.getElementById('ph1_empty').classList.add('hidden'); document.getElementById('remove1').classList.remove('hidden'); document.getElementById('remove1').classList.add('flex'); }
+  if(temp.b64_2){ document.getElementById('preview2').src=temp.b64_2; document.getElementById('preview2').classList.remove('hidden'); document.getElementById('ph2_empty').classList.add('hidden'); document.getElementById('remove2').classList.remove('hidden'); document.getElementById('remove2').classList.add('flex'); }
+  if(temp.b64_3){ document.getElementById('preview3').src=temp.b64_3; document.getElementById('preview3').classList.remove('hidden'); document.getElementById('ph3_empty').classList.add('hidden'); document.getElementById('remove3').classList.remove('hidden'); document.getElementById('remove3').classList.add('flex'); }
+  window.scrollTo({top:0, behavior:'smooth'}); document.getElementById('price').focus(); toast(`🔁 已複製 ${it.product_name}`);
+}
+
+async function handleAdd(){
+  const name=document.getElementById('productName').value.trim();
+  const price=parseFloat(document.getElementById('price').value);
+  const weight=parseFloat(document.getElementById('weight').value)||1;
+  const unit=document.getElementById('unit').value;
+  const shop=document.getElementById('shop').value;
+  const category=document.getElementById('category').value;
+  if(!name||!price){ toast('請填產品名同價錢'); return; }
+  const data={product_name:name, price, weight, unit, weight_g:toG(weight,unit), price_per_100g:per100(price,weight,unit), shop, category, created_at:serverTimestamp(), image1:temp.b64_1||'', image2:temp.b64_2||'', image3:temp.b64_3||''};
+  const btn=document.getElementById('addBtn'); btn.disabled=true; btn.innerHTML='儲存中...';
+  try{
+    await addDoc(collection(db,'prices'), data);
+    document.getElementById('productName').value=''; document.getElementById('price').value=''; document.getElementById('weight').value=''; document.getElementById('category').value='';
+    temp={b64_1:null,b64_2:null,b64_3:null};
+    ['preview1','preview2','preview3'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+    ['ph1_empty','ph2_empty','ph3_empty'].forEach(id=>document.getElementById(id).classList.remove('hidden'));
+    ['remove1','remove2','remove3'].forEach(id=>{ document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); });
+    document.getElementById('file1').value=''; document.getElementById('file2').value=''; document.getElementById('file3').value='';
+    toast('✅ 已儲存');
+  }catch(e){ toast('❌ '+e.message); }
+  btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-plus"></i> 儲存格價';
+}
+document.getElementById('addBtn').addEventListener('click', handleAdd);
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('filterCategory').addEventListener('change', render);
+document.getElementById('filterShop').addEventListener('change', render);
+document.getElementById('sortBy').addEventListener('change', render);
+document.getElementById('fab').addEventListener('click', ()=>{ document.getElementById('productName').focus(); window.scrollTo({top:0,behavior:'smooth'}); });
+async function handleFile(inp, prev, emptyId, rem, key){ const f=inp.files[0]; if(!f)return; const b=await compress(f); temp['b64_'+key]=b; document.getElementById(prev).src=b; document.getElementById(prev).classList.remove('hidden'); document.getElementById(emptyId).classList.add('hidden'); const rm=document.getElementById(rem); rm.classList.remove('hidden'); rm.classList.add('flex'); }
+document.getElementById('file1').addEventListener('change', e=>handleFile(e.target,'preview1','ph1_empty','remove1','1'));
+document.getElementById('file2').addEventListener('change', e=>handleFile(e.target,'preview2','ph2_empty','remove2','2'));
+document.getElementById('file3').addEventListener('change', e=>handleFile(e.target,'preview3','ph3_empty','remove3','3'));
+document.getElementById('remove1').addEventListener('click', e=>{ e.preventDefault(); temp.b64_1=null; document.getElementById('preview1').classList.add('hidden'); document.getElementById('ph1_empty').classList.remove('hidden'); e.currentTarget.classList.add('hidden'); e.currentTarget.classList.remove('flex'); document.getElementById('file1').value=''; });
+document.getElementById('remove2').addEventListener('click', e=>{ e.preventDefault(); temp.b64_2=null; document.getElementById('preview2').classList.add('hidden'); document.getElementById('ph2_empty').classList.remove('hidden'); e.currentTarget.classList.add('hidden'); e.currentTarget.classList.remove('flex'); document.getElementById('file2').value=''; });
+document.getElementById('remove3').addEventListener('click', e=>{ e.preventDefault(); temp.b64_3=null; document.getElementById('preview3').classList.add('hidden'); document.getElementById('ph3_empty').classList.remove('hidden'); e.currentTarget.classList.add('hidden'); e.currentTarget.classList.remove('flex'); document.getElementById('file3').value=''; });
+function openEdit(id){ const it=items.find(x=>x.id===id); if(!it)return; editingId=id; document.getElementById('editName').value=it.product_name||''; document.getElementById('editPrice').value=it.price||''; document.getElementById('editWeight').value=it.weight||''; document.getElementById('editUnit').value=it.unit||'g'; document.getElementById('editShop').value=it.shop||'其他'; document.getElementById('editCategory').value=it.category||''; document.getElementById('editPreview1').src=it.image1||''; document.getElementById('editPreview2').src=it.image2||''; document.getElementById('editPreview3').src=it.image3||''; editTemp={b64_1:it.image1||'',b64_2:it.image2||'',b64_3:it.image3||''}; document.getElementById('editModal').classList.remove('hidden'); }
+document.getElementById('editClose').addEventListener('click', ()=>document.getElementById('editModal').classList.add('hidden'));
+document.getElementById('editFile1').addEventListener('change', async e=>{ const b=await compress(e.target.files[0]); editTemp.b64_1=b; document.getElementById('editPreview1').src=b; });
+document.getElementById('editFile2').addEventListener('change', async e=>{ const b=await compress(e.target.files[0]); editTemp.b64_2=b; document.getElementById('editPreview2').src=b; });
+document.getElementById('editFile3').addEventListener('change', async e=>{ const b=await compress(e.target.files[0]); editTemp.b64_3=b; document.getElementById('editPreview3').src=b; });
+document.getElementById('editRemove1').addEventListener('click', ()=>{ editTemp.b64_1=''; document.getElementById('editPreview1').src=''; });
+document.getElementById('editRemove2').addEventListener('click', ()=>{ editTemp.b64_2=''; document.getElementById('editPreview2').src=''; });
+document.getElementById('editRemove3').addEventListener('click', ()=>{ editTemp.b64_3=''; document.getElementById('editPreview3').src=''; });
+document.getElementById('editSave').addEventListener('click', async()=>{ const n=document.getElementById('editName').value.trim(); const p=parseFloat(document.getElementById('editPrice').value); const w=parseFloat(document.getElementById('editWeight').value)||1; const u=document.getElementById('editUnit').value; const sh=document.getElementById('editShop').value; const cat=document.getElementById('editCategory').value; const upd={product_name:n, price:p, weight:w, unit:u, weight_g:toG(w,u), price_per_100g:per100(p,w,u), shop:sh, category:cat, image1:editTemp.b64_1, image2:editTemp.b64_2, image3:editTemp.b64_3}; await updateDoc(doc(db,'prices',editingId), upd); document.getElementById('editModal').classList.add('hidden'); toast('✅ 已更新'); });
+document.getElementById('editDelete').addEventListener('click', async()=>{ if(!confirm('確定刪除？'))return; await deleteDoc(doc(db,'prices',editingId)); document.getElementById('editModal').classList.add('hidden'); toast('🗑️ 已刪除'); });
+function openLb(src,gid){ const g=items.find(x=>x.id===gid); let imgs=[]; let labels=[]; if(g){ if(g.image1){ imgs.push(g.image1); labels.push('貨品相'); } if(g.image2){ imgs.push(g.image2); labels.push('價錢牌'); } if(g.image3){ imgs.push(g.image3); labels.push('食物標籤'); } } if(!imgs.length)imgs=[src]; lb.images=imgs; lb.labels=labels; lb.index=imgs.indexOf(src); if(lb.index<0)lb.index=0; document.getElementById('lightbox').classList.remove('hidden'); document.body.style.overflow='hidden'; showLb(); }
+function showLb(){ document.getElementById('lbImg').src=lb.images[lb.index]; document.getElementById('lbLabel').textContent=lb.labels[lb.index]||''; document.getElementById('lbDots').innerHTML=lb.images.map((_,i)=>`<div class="w-2 h-2 rounded-full ${i===lb.index?'bg-white':'bg-white/40'}"></div>`).join(''); }
+function closeLb(){ document.getElementById('lightbox').classList.add('hidden'); document.body.style.overflow=''; }
+document.getElementById('lbClose').addEventListener('click', closeLb); document.getElementById('lightbox').addEventListener('click', e=>{ if(e.target.id==='lightbox')closeLb(); }); document.getElementById('lbPrev').addEventListener('click', ()=>{ lb.index=(lb.index-1+lb.images.length)%lb.images.length; showLb(); }); document.getElementById('lbNext').addEventListener('click', ()=>{ lb.index=(lb.index+1)%lb.images.length; showLb(); });
+</script>
+</body>
+</html>
