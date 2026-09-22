@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>真·格價王 v28 - 直連OCR.Space免Worker版 (繁中+去紅字)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>*{font-family:'Noto Sans HK',sans-serif} input,select,textarea{font-size:16px} @media(min-width:768px){input,select,textarea{font-size:14px}} .lightbox{backdrop-filter:blur(8px)}</style>
+</head>
+<body class="bg-[#faf9f6]">
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b">
+  <div class="max-w-[1400px] mx-auto px-3 md:px-6 h-[56px] flex items-center justify-between">
+    <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">F</div><div><div class="font-bold text-[14px]">真·格價王 v23</div><div class="text-[10px] text-orange-600">電子價錢牌專用 · 自動裁剪去紅字 · OCR.Space cht繁中</div></div><span class="hidden md:inline-flex text-[10px] px-2 py-1 rounded-full bg-orange-50 border ml-2">繁中cht + Firebase (OCR.Space繁中)</span></div>
+    <div class="flex gap-1.5"><span id="firebaseStatus" class="text-[10px] px-2 py-1 rounded-full bg-neutral-100 border">Firebase連接中...</span><button id="settingsBtn" class="w-8 h-8 rounded-full bg-black text-white">⚙️</button></div>
+  </div>
+</header>
+<main class="max-w-[1400px] mx-auto px-3 md:px-6 py-3 grid grid-cols-1 lg:grid-cols-12 gap-3">
+  <div class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-[80px]">
+    <div class="bg-white rounded-[16px] border shadow-sm">
+      <div class="p-3 md:p-5 border-b flex items-center justify-between">
+        <div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center">+</div><div class="font-bold text-[14px]">新增格價</div></div>
+        <div class="flex items-center gap-1">
+          <div id="step1" class="px-2 py-1 rounded-full bg-neutral-100 text-[10px]">① Google認字</div>
+          <div class="text-neutral-300">→</div>
+          <div id="step2" class="px-2 py-1 rounded-full bg-neutral-100 text-[10px]">② 本地分析</div>
+          <div class="text-neutral-300">→</div>
+          <div id="step3" class="px-2 py-1 rounded-full bg-neutral-100 text-[10px]">③ Firebase</div>
+        </div>
+      </div>
+      <div class="p-3 md:p-5 space-y-3">
+        <input id="productName" placeholder="產品名 (Google認字→本地分析自動填)" class="w-full h-[48px] rounded-[12px] border px-4 text-[15px] bg-[#fafafa]">
+        <div class="grid grid-cols-2 gap-2">
+          <select id="category" class="w-full h-[48px] rounded-[12px] border px-3 text-[14px] bg-white"><option value="">📦 種類</option><option>飲品</option><option>零食</option><option>糧油</option><option>罐頭</option><option>調味料</option><option>日用品</option><option>急凍</option></select>
+          <select id="store" class="w-full h-[48px] rounded-[12px] border px-3 text-[14px] bg-white"><option value="">🏪 店舖</option><option>惠康</option><option>百佳</option><option>萬寧</option><option>屈臣氏</option><option>AEON</option><option>Donki</option><option>HKTVmall</option></select>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <input id="price" type="number" placeholder="價錢 $" class="h-[48px] rounded-[12px] border px-3">
+          <input id="weight" type="number" placeholder="重量" class="h-[48px] rounded-[12px] border px-3">
+          <select id="unit" class="h-[48px] rounded-[12px] border px-2 text-[13px] bg-white"><option value="ml">ml</option><option value="g">g</option><option value="kg">kg</option><option value="L">L</option><option value="件">件</option></select>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <label class="relative aspect-[4/3] rounded-[12px] border-2 border-dashed border-blue-300 bg-blue-50 flex flex-col items-center justify-center gap-1 cursor-pointer overflow-hidden"><input id="file1" type="file" accept="image/*" capture="environment" class="hidden"><div class="text-[20px]">📦</div><div class="text-[10px] font-bold text-blue-700">貨品相</div><div class="text-[8px] text-blue-600">點擊放大</div><img id="preview1" class="hidden absolute inset-0 w-full h-full object-cover rounded-[10px]"><button id="remove1" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black text-white text-[10px] z-10">✕</button></label>
+          <label class="relative aspect-[4/3] rounded-[12px] border-2 border-dashed border-green-300 bg-green-50 flex flex-col items-center justify-center gap-1 cursor-pointer overflow-hidden"><input id="file2" type="file" accept="image/*" capture="environment" class="hidden"><div class="text-[20px]">💰</div><div class="text-[10px] font-bold text-green-700">價錢牌</div><div class="text-[8px] text-green-600">點擊放大</div><img id="preview2" class="hidden absolute inset-0 w-full h-full object-cover rounded-[10px]"><button id="remove2" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black text-white text-[10px] z-10">✕</button></label>
+          <label class="relative aspect-[4/3] rounded-[12px] border-2 border-dashed border-orange-300 bg-orange-50 flex flex-col items-center justify-center gap-1 cursor-pointer overflow-hidden"><input id="file3" type="file" accept="image/*" capture="environment" class="hidden"><div class="text-[20px]">🏷️</div><div class="text-[10px] font-bold text-orange-700">食物標籤</div><div class="text-[8px] text-orange-600">點擊放大</div><img id="preview3" class="hidden absolute inset-0 w-full h-full object-cover rounded-[10px]"><button id="remove3" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black text-white text-[10px] z-10">✕</button></label>
+        </div>
+        <div class="rounded-[14px] border overflow-hidden bg-white">
+          <div class="h-[40px] px-3 flex items-center justify-between bg-[#fafafa] border-b"><div class="font-bold text-[11px]">📝 掃描原文 (Google→本地分析)</div><div class="flex gap-1"><button id="copyRawBtn" class="h-7 px-2.5 rounded-full bg-black text-white text-[10px]">複製</button><button id="clearRawBtn" class="h-7 w-7 rounded-full border bg-white text-[10px]">🗑️</button></div></div>
+          <textarea id="ocrRawHistory" placeholder="Google免費認字 → 本地分析 → 自動貼呢度" class="w-full h-[100px] p-3 text-[11px] font-mono resize-none outline-none"></textarea>
+        </div>
+        <div class="rounded-[14px] border border-blue-100 bg-blue-50/50 overflow-hidden">
+          <div class="h-[36px] px-3 flex items-center justify-between"><div class="font-bold text-[11px] text-blue-900">🔍 步驟1：Google認字</div></div>
+          <div id="googleRaw" class="px-3 pb-2 text-[11px] font-mono min-h-[24px]">未掃描</div>
+        </div>
+        <div class="rounded-[14px] border border-green-100 bg-green-50/50 overflow-hidden">
+          <div class="h-[36px] px-3 flex items-center justify-between"><div class="font-bold text-[11px] text-green-900">🧠 步驟2：本地分析</div><button id="applyBtn" class="h-6 px-2 rounded-full bg-green-600 text-white text-[9px]">套用→上面</button></div>
+          <div id="localResult" class="px-3 pb-2 text-[11px] font-mono min-h-[24px]">等步驟1完成</div>
+          <div id="aiResult" class="px-3 pb-2 text-[10px] hidden"></div>
+        </div>
+        <div id="searchResults" class="rounded-[14px] border border-blue-200 bg-blue-50/30 overflow-hidden hidden">
+          <div class="h-[36px] px-3 flex items-center justify-between bg-blue-50 border-b"><div class="font-bold text-[11px] text-blue-900">🌐 步驟3：網上相同</div><span id="searchCount" class="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-600 text-white">0 條</span></div>
+          <div id="searchList" class="p-2 space-y-2 max-h-[150px] overflow-y-auto"></div>
+        </div>
+        <button id="saveBtn" class="w-full h-[52px] rounded-[14px] bg-orange-500 text-white font-bold text-[15px] flex items-center justify-center gap-2"><span>☁️</span> 儲存到Firebase (圖片留底)</button>
+        <div class="text-center text-[10px] text-neutral-500">圖片上傳到Firebase，永久留底，點擊可放大 · 香港可用</div>
+      </div>
+    </div>
+  </div>
+  <div class="lg:col-span-7 xl:col-span-8">
+    <div class="bg-white rounded-[16px] border p-3 mb-3 flex items-center justify-between">
+      <div class="font-bold text-[13px]">📦 已儲存格價 (Firebase)</div>
+      <div class="flex gap-2"><button id="refreshBtn" class="h-7 px-3 rounded-full bg-neutral-100 border text-[11px]">🔄 刷新</button><span id="countBadge" class="h-7 px-3 rounded-full bg-orange-50 border text-[11px] flex items-center">0 項</span></div>
+    </div>
+    <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+  </div>
+</main>
+
+<!-- 圖片放大 Lightbox -->
+<div id="lightbox" class="fixed inset-0 z-[100] hidden bg-black/90 lightbox flex items-center justify-center p-4">
+  <button id="closeLightbox" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 text-white text-[20px]">✕</button>
+  <img id="lightboxImg" class="max-w-full max-h-full rounded-[12px] object-contain">
+  <div id="lightboxCaption" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 px-4 py-2 rounded-full text-[12px]"></div>
+</div>
+
+<div id="settingsModal" class="fixed inset-0 z-[60] hidden"><div class="absolute inset-0 bg-black/40" id="closeSettings"></div><div class="absolute right-0 top-0 bottom-0 w-[90%] max-w-[380px] bg-white p-5 overflow-y-auto"><div class="flex justify-between mb-5"><div class="font-bold">⚙️ v23 Firebase設定</div><button id="closeSettings2" class="w-8 h-8 rounded-full bg-neutral-100">✕</button></div>
+<div class="space-y-3">
+<div class="bg-orange-50 border border-orange-200 rounded-[12px] p-3"><div class="font-bold text-[12px] text-orange-800">🔥 Firebase (圖片永久留底)</div><div class="text-[11px] mt-1">去 https://console.firebase.google.com/ 創建專案，免費額度：5GB儲存 + 1GB下載/日，夠你用</div>
+<textarea id="firebaseConfig" id="ocrSpaceKeyInput" placeholder='OCR.Space API Key K8開頭，免費，去 https://ocr.space/ocrapi 申請，免綁卡' class="w-full h-[36px] rounded-[10px] border px-3 text-[11px] font-mono mt-2" /><textarea id="firebaseConfig" placeholder='貼上 firebaseConfig JSON，例如：&#10;{&#10;  "apiKey": "AIza...",&#10;  "authDomain": "...firebaseapp.com",&#10;  "projectId": "hk-price-...",&#10;  "storageBucket": "...appspot.com",&#10;  "messagingSenderId": "...",&#10;  "appId": "1:..."&#10;}' class="w-full h-[140px] rounded-[10px] border p-2 text-[10px] font-mono mt-2"></textarea>
+<button id="saveFirebase" class="mt-2 w-full h-9 rounded-full bg-orange-500 text-white text-[11px] font-bold">💾 儲存Firebase設定 + 連接</button><div id="firebaseStatusDetail" class="mt-2 text-[11px]"></div>
+<div class="mt-3 text-[10px] bg-white rounded-[8px] border p-2"><div class="font-bold">設定步驟：</div><div class="mt-1">1. console.firebase.google.com → 新增專案 hk-price<br>2. Storage → 開始使用 → 允許所有 (test mode)<br>3. Firestore → 開始使用 → test mode<br>4. 專案設定 → 一般 → 你的應用程式 → Web → 複制 firebaseConfig<br>5. 貼上上面 → 儲存</div></div>
+</div>
+<div class="bg-blue-50 border rounded-[12px] p-3"><div class="font-bold text-[12px]">☁️ Worker (Google搜)</div><input id="workerUrl" class="w-full h-[36px] rounded-[10px] border px-3 text-[11px] font-mono mt-2" value="https://hk-price-api.siumeifc1988.workers.dev"><button id="saveWorkerUrl" class="mt-2 h-8 px-3 rounded-full bg-blue-600 text-white text-[10px]">儲存Worker</button><div id="workerStatus" class="mt-2 text-[11px]"></div></div>
+</div></div></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
+
+const WORKER_URL_DEFAULT='https://hk-price-api.siumeifc1988.workers.dev';
+let currentImages=[null,null,null];
+let firebaseApp=null, db=null, storage=null;
+let products=[];
+
+function toast(m){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='fixed bottom-5 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-2 rounded-full text-[12px] z-[100]';document.body.appendChild(t);}t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+function getWorkerUrl(){return localStorage.getItem('worker_url')||WORKER_URL_DEFAULT;}
+function setStep(n,s){const el=document.getElementById('step'+n);if(!el)return;if(s==='active'){el.className='px-2 py-1 rounded-full text-[10px] bg-blue-100 text-blue-700 border';el.textContent=['','① Google認字中...','② 本地分析中...','③ Firebase中...'][n];}else if(s==='done'){el.className='px-2 py-1 rounded-full text-[10px] bg-green-50 text-green-700 border';el.textContent=['','① Google完成','② 本地完成','③ Firebase完成'][n];}else{el.className='px-2 py-1 rounded-full bg-neutral-100 text-[10px]';el.textContent=['','① Google認字','② 本地分析','③ Firebase'][n];}}
+
+function initFirebase(){
+  const cfgStr = localStorage.getItem('firebase_config');
+  if(!cfgStr){ document.getElementById('firebaseStatus').textContent='❌ 未設定Firebase'; document.getElementById('firebaseStatus').className='text-[10px] px-2 py-1 rounded-full bg-red-50 border text-red-600'; return false; }
+  try{
+    const cfg = JSON.parse(cfgStr);
+    firebaseApp = initializeApp(cfg);
+    db = getFirestore(firebaseApp);
+    storage = getStorage(firebaseApp);
+    document.getElementById('firebaseStatus').textContent='✅ Firebase已連接';
+    document.getElementById('firebaseStatus').className='text-[10px] px-2 py-1 rounded-full bg-green-50 border text-green-700';
+    document.getElementById('firebaseStatusDetail').textContent='✅ 已連接：'+cfg.projectId;
+    loadProducts();
+    return true;
+  }catch(e){
+    document.getElementById('firebaseStatus').textContent='❌ Firebase錯誤';
+    document.getElementById('firebaseStatusDetail').textContent='錯誤：'+e.message;
+    return false;
+  }
+}
+
+async function loadProducts(){
+  if(!db) return;
+  try{
+    const q = query(collection(db, 'prices'), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    products = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    render();
+    document.getElementById('countBadge').textContent=products.length+' 項';
+  }catch(e){
+    console.error(e);
+    toast('載入失敗：'+e.message);
+  }
+}
+
+function smartLocalAnalysis(rawText){
+  if(!rawText) return {price:'', product:'', weight:'', cleaned:''};
+  let cleaned = rawText.replace(/SE SE Rl|Shap ey es Nw|從 i i|[^\u4e00-\u9fa5a-zA-Z0-9$\n\s.,\-:()/mlgkgMLGKG]/g, ' ').replace(/  +/g, ' ').trim();
+  let price = '';
+  const pricePatterns = [/\$\s*(\d+\.\d{1,2})/, /\$\s*(\d+)/, /(\d+\.\d{2})/];
+  for(let p of pricePatterns){ const m = rawText.match(p); if(m){ price = m[0].includes('$') ? m[0].replace(/\s/g,'') : '$'+m[1]; break; } }
+  let weight = '';
+  const wMatch = rawText.match(/(\d+\.?\d*)\s*(ml|g|kg|l|ML|G|KG|L)/i);
+  if(wMatch) weight = wMatch[1] + wMatch[2].toLowerCase();
+  const brands = ['GRAND TASTE','雀巢','NESTLE','可口可樂','COCA','百事','PEPSI','維他','VITA','屈臣氏','WATSONS','惠康','百佳','萬寧','AEON','DONKI'];
+  let lines = rawText.split('\n').map(l=>l.trim()).filter(l=>l.length>=2 && l.length<=30);
+  lines = lines.filter(l=>{ const garbled = (l.match(/  +/g)||[]).length>2; return !garbled; });
+  let product = '';
+  for(let b of brands){ const found = lines.find(l=>l.toUpperCase().includes(b)); if(found){ product = found.substring(0,30); break; } }
+  if(!product){ const readable = lines.filter(l=>l.length>=4).sort((a,b)=>b.length-a.length); product = (readable[0]||'').substring(0,30); }
+  if(!product){ const first = rawText.split('\n').map(l=>l.trim()).filter(l=>l.length>=2)[0]||''; product = first.substring(0,30).replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g,'').trim(); }
+  return {price, product, weight, cleaned: cleaned || rawText};
+}
+
+async function searchSame(name){
+  setStep(3,'active');
+  const wurl=getWorkerUrl();
+  const box=document.getElementById('searchResults'); const list=document.getElementById('searchList');
+  if(!wurl.includes('workers.dev')){ setStep(3,'done'); return; }
+  box.classList.remove('hidden'); list.innerHTML='<div class="text-[11px] p-2">🌐 搜尋：'+name+'...</div>';
+  try{
+    const res=await fetch(wurl+'/api/google-search?q='+encodeURIComponent(name+' 香港 價錢'));
+    const data=await res.json();
+    if(data.items?.length){
+      list.innerHTML=''; data.items.forEach((it,i)=>{ const d=document.createElement('div'); d.className='bg-white rounded-[10px] border p-2 text-[11px]'; d.innerHTML='<div class="font-bold truncate">'+it.title+'</div><a href="'+it.link+'" target="_blank" class="mt-1 inline-block px-2 py-1 rounded-full bg-blue-600 text-white text-[9px]">開網頁</a>'; list.appendChild(d); });
+      document.getElementById('searchCount').textContent=data.items.length+' 條';
+    }
+    setStep(3,'done');
+  }catch(e){ setStep(3,'done'); }
+}
+
+async function doGoogleThenLocal(b64, type){
+  setStep(1,'active'); setStep(2,''); setStep(3,'');
+  document.getElementById('googleRaw').textContent='步驟1：Google免費認字中...';
+  document.getElementById('localResult').textContent='等步驟1完成';
+  let raw='';
+  try{
+    const worker=await Tesseract.createWorker('eng+chi_tra');
+    const ret=await worker.recognize(b64); raw=ret.data.text; await worker.terminate();
+    document.getElementById('googleRaw').textContent=raw||'未能識別';
+    setStep(1,'done');
+  }catch(e){ document.getElementById('googleRaw').textContent='失敗：'+e.message; setStep(1,''); return; }
+  if(!raw || raw.trim().length<2){ document.getElementById('localResult').textContent='未認到字'; return; }
+  setStep(2,'active');
+  const result = smartLocalAnalysis(raw);
+  document.getElementById('localResult').textContent=result.cleaned||raw;
+  document.getElementById('aiResult').classList.remove('hidden');
+  document.getElementById('aiResult').innerHTML='<div class="flex gap-1 flex-wrap mt-1">'+(result.price?'<span class="px-2 py-0.5 rounded-full bg-green-600 text-white text-[10px]">'+result.price+'</span>':'')+(result.weight?'<span class="px-2 py-0.5 rounded-full bg-orange-500 text-white text-[10px]">'+result.weight+'</span>':'')+(result.product?'<span class="px-2 py-0.5 rounded-full bg-blue-600 text-white text-[10px]">'+result.product+'</span>':'')+'</div>';
+  if(result.price) document.getElementById('price').value=result.price.replace(/[^0-9.]/g,'');
+  if(result.weight){ const m=result.weight.match(/(\d+\.?\d*)\s*(ml|g|kg|l)/i); if(m){document.getElementById('weight').value=m[1]; document.getElementById('unit').value=m[2].toLowerCase();} }
+  if(result.product) document.getElementById('productName').value=result.product;
+  const rawEl=document.getElementById('ocrRawHistory'); rawEl.value='[Google] '+raw+'\n[本地] 產品：'+(result.product||'')+' 價錢：'+(result.price||'')+'\n---\n'+rawEl.value;
+  setStep(2,'done');
+  if(result.product) searchSame(result.product);
+}
+
+function openLightbox(src, caption){
+  document.getElementById('lightboxImg').src=src;
+  document.getElementById('lightboxCaption').textContent=caption||'';
+  document.getElementById('lightbox').classList.remove('hidden');
+}
+function closeLightbox(){ document.getElementById('lightbox').classList.add('hidden'); }
+
+[1,2,3].forEach(i=>{
+  const fileEl=document.getElementById('file'+i); const pre=document.getElementById('preview'+i); const rem=document.getElementById('remove'+i);
+  fileEl.addEventListener('change', async e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const r=new FileReader(); r.onload=async ev=>{
+      let b64=ev.target.result;
+      try{ const img=new Image(); img.src=b64; await new Promise(res=>img.onload=res); const c=document.createElement('canvas'); const maxW=1024; let w=img.width,h=img.height; if(w>maxW){h=h*maxW/w;w=maxW;} c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h); b64=c.toDataURL('image/jpeg',0.8); }catch{}
+      currentImages[i-1]=b64; pre.src=b64; pre.classList.remove('hidden'); rem.classList.remove('hidden');
+      pre.onclick = (ev)=>{ ev.preventDefault(); ev.stopPropagation(); openLightbox(b64, '預覽圖 '+i); };
+      await doGoogleThenLocal(b64, i===1?'貨品':i===2?'價錢牌':'食物標籤');
+    }; r.readAsDataURL(file);
+  });
+  rem.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fileEl.value=''; pre.classList.add('hidden'); rem.classList.add('hidden'); currentImages[i-1]=null; });
+});
+
+document.getElementById('closeLightbox').addEventListener('click', closeLightbox);
+document.getElementById('lightbox').addEventListener('click', (e)=>{ if(e.target.id==='lightbox') closeLightbox(); });
+
+document.getElementById('saveBtn').addEventListener('click', async ()=>{
+  if(!db || !storage){ toast('❌ 請先去⚙️設定Firebase'); document.getElementById('settingsModal').classList.remove('hidden'); return; }
+  const name=document.getElementById('productName').value.trim();
+  const priceVal=document.getElementById('price').value.trim();
+  const price=parseFloat(priceVal);
+  if(!name){ toast('❌ 請填產品名'); return; }
+  if(!priceVal || isNaN(price)){ toast('❌ 請填價錢'); return; }
+  setStep(3,'active');
+  document.getElementById('saveBtn').innerHTML='<span>⏳</span> 上傳圖片到Firebase中...';
+  document.getElementById('saveBtn').disabled=true;
+  try{
+    const imageUrls=[];
+    for(let i=0;i<currentImages.length;i++){
+      const b64=currentImages[i];
+      if(!b64) continue;
+      // b64 to blob
+      const res = await fetch(b64);
+      const blob = await res.blob();
+      const fileName = 'prices/' + Date.now() + '_' + i + '.jpg';
+      const storageRef = ref(storage, fileName);
+      await uploadBytes(storageRef, blob);
+      const url = await getDownloadURL(storageRef);
+      imageUrls.push(url);
+    }
+    const docData={
+      name,
+      category: document.getElementById('category').value,
+      store: document.getElementById('store').value,
+      price,
+      weight: document.getElementById('weight').value,
+      unit: document.getElementById('unit').value,
+      imageUrls,
+      ocrRaw: document.getElementById('ocrRawHistory').value.substring(0,2000),
+      createdAt: new Date(),
+      time: new Date().toLocaleString('zh-HK')
+    };
+    await addDoc(collection(db, 'prices'), docData);
+    toast('✅ 已儲存到Firebase：'+name);
+    setStep(3,'done');
+    document.getElementById('productName').value='';
+    document.getElementById('price').value='';
+    document.getElementById('weight').value='';
+    currentImages=[null,null,null];
+    [1,2,3].forEach(i=>{ document.getElementById('preview'+i).classList.add('hidden'); document.getElementById('remove'+i).classList.add('hidden'); document.getElementById('file'+i).value=''; });
+    loadProducts();
+  }catch(e){
+    console.error(e);
+    toast('❌ Firebase儲存失敗：'+e.message);
+  }finally{
+    document.getElementById('saveBtn').innerHTML='<span>☁️</span> 儲存到Firebase (圖片留底)';
+    document.getElementById('saveBtn').disabled=false;
+  }
+});
+
+function render(){
+  const g=document.getElementById('productGrid');
+  if(!products.length){ g.innerHTML='<div class="col-span-full py-12 text-center text-neutral-400">未有格價，Firebase連接後會顯示<br>圖片會永久留底，點擊可放大</div>'; return; }
+  g.innerHTML=products.map(p=>`
+    <div class="bg-white rounded-[14px] border p-3 flex gap-3">
+      <div class="w-[72px] h-[72px] rounded-[10px] bg-neutral-100 overflow-hidden flex-shrink-0 cursor-pointer" onclick="window.openLightbox('${p.imageUrls?.[0]||''}', '${p.name}')">
+        ${p.imageUrls?.[0] ? `<img src="${p.imageUrls[0]}" class="w-full h-full object-cover hover:scale-110 transition">` : '<div class="w-full h-full flex items-center justify-center">📦</div>'}
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="font-bold text-[13px] truncate">${p.name}</div>
+        <div class="text-[11px] text-neutral-500">${p.category||''} ${p.store||''} ${p.weight||''}${p.unit||''}</div>
+        <div class="font-bold text-[14px] text-orange-600">$${(p.price||0).toFixed(2)}</div>
+        <div class="text-[9px] text-neutral-400">${p.time||''}</div>
+        ${p.imageUrls?.length>1 ? `<div class="flex gap-1 mt-1">${p.imageUrls.map((url,idx)=>`<img src="${url}" class="w-8 h-8 rounded-[6px] object-cover cursor-pointer border" onclick="window.openLightbox('${url}', '${p.name} - 圖${idx+1}')">`).join('')}</div>` : ''}
+      </div>
+      <button onclick="window.deleteProduct('${p.id}')" class="w-7 h-7 rounded-full bg-neutral-100 text-[12px] flex-shrink-0">🗑️</button>
+    </div>
+  `).join('');
+}
+
+window.openLightbox = openLightbox;
+window.deleteProduct = async (id)=>{
+  if(!confirm('刪除？圖片都會喺Firebase刪除？(而家只刪記錄)')) return;
+  try{ await deleteDoc(doc(db, 'prices', id)); toast('已刪除'); loadProducts(); }catch(e){ toast('刪除失敗：'+e.message); }
+};
+
+document.getElementById('copyRawBtn').addEventListener('click', ()=>{ navigator.clipboard.writeText(document.getElementById('ocrRawHistory').value); toast('已複製'); });
+document.getElementById('clearRawBtn').addEventListener('click', ()=>{ if(confirm('清空？')) document.getElementById('ocrRawHistory').value=''; });
+document.getElementById('applyBtn').addEventListener('click', ()=>{ const cur=document.getElementById('localResult').textContent; if(cur){ document.getElementById('ocrRawHistory').value=cur+'\n---\n'+document.getElementById('ocrRawHistory').value; toast('已套用'); }});
+document.getElementById('refreshBtn').addEventListener('click', loadProducts);
+
+// Settings
+const modal=document.getElementById('settingsModal');
+document.getElementById('settingsBtn').addEventListener('click', ()=>modal.classList.remove('hidden'));
+document.getElementById('closeSettings').addEventListener('click', ()=>modal.classList.add('hidden'));
+document.getElementById('closeSettings2').addEventListener('click', ()=>modal.classList.add('hidden'));
+document.getElementById('saveWorkerUrl').addEventListener('click', ()=>{ localStorage.setItem('worker_url', document.getElementById('workerUrl').value.trim()); document.getElementById('workerStatus').textContent='✅ 已儲存'; toast('Worker已儲存'); });
+document.getElementById('saveFirebase').addEventListener('click', ()=>{
+  const cfgStr=document.getElementById('firebaseConfig').value.trim();
+  if(!cfgStr){ toast('請貼上firebaseConfig'); return; }
+  try{
+    const cfg=JSON.parse(cfgStr);
+    localStorage.setItem('firebase_config', JSON.stringify(cfg));
+    document.getElementById('firebaseStatusDetail').textContent='儲存中，嘗試連接...';
+    if(initFirebase()){ toast('✅ Firebase已連接'); modal.classList.add('hidden'); }
+  }catch(e){ document.getElementById('firebaseStatusDetail').textContent='❌ JSON格式錯誤：'+e.message; }
+});
+
+if(!localStorage.getItem('worker_url')) localStorage.setItem('worker_url', WORKER_URL_DEFAULT);
+const savedCfg=localStorage.getItem('firebase_config');
+if(savedCfg){ document.getElementById('firebaseConfig').value=savedCfg; }
+initFirebase();
+</script>
+</body>
+</html>
