@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>真·格價王 v18 - DeepSeek最準+免費備援</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700&display=swap" rel="stylesheet">
+<style>*{font-family:'Noto Sans HK',sans-serif} .scrollbar-hide::-webkit-scrollbar{display:none} input,select,textarea{font-size:16px} @media(min-width:768px){input,select,textarea{font-size:14px}}</style>
+</head>
+<body class="bg-[#faf9f6]">
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b">
+  <div class="max-w-[1400px] mx-auto px-3 md:px-6 h-[56px] flex items-center justify-between">
+    <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold">G</div><div><div class="font-bold text-[14px]">真·格價王 v18</div><div class="text-[10px] text-blue-600">DeepSeek最準 · 免費備援 · 響應式</div></div><span class="hidden md:inline-flex text-[10px] px-2 py-1 rounded-full bg-purple-50 border border-purple-200 ml-2">DeepSeek香港可用</span></div>
+    <div class="flex gap-1.5"><span id="workerBadge" class="text-[10px] px-2 py-1 rounded-full bg-green-50 border">✅ siumeifc1988</span><button id="settingsBtn" class="w-8 h-8 rounded-full bg-black text-white">⚙️</button></div>
+  </div>
+</header>
+<main class="max-w-[1400px] mx-auto px-3 md:px-6 py-3 grid grid-cols-1 lg:grid-cols-12 gap-3">
+  <div class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-[80px]">
+    <div class="bg-white rounded-[16px] border shadow-sm">
+      <div class="p-3 md:p-5 flex items-center justify-between border-b">
+        <div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center">+</div><div class="font-bold text-[14px]">新增格價</div></div>
+        <div class="flex items-center gap-2"><span id="autoStatus" class="text-[10px] px-2 py-1 rounded-full bg-neutral-100">待機</span><button id="deepSeekBtn" class="h-8 px-3 rounded-full bg-purple-600 text-white text-[11px] font-bold">DeepSeek最準</button></div>
+      </div>
+      <div class="p-3 md:p-5 space-y-3">
+        <input id="productName" placeholder="產品名 (DeepSeek自動識別最準)" class="w-full h-[48px] rounded-[12px] border px-4 text-[15px] bg-[#fafafa] focus:bg-white outline-none">
+        <div class="grid grid-cols-2 gap-2">
+          <select id="category" class="w-full h-[48px] rounded-[12px] border px-3 text-[14px] bg-white"><option value="">📦 種類</option><option>飲品</option><option>零食</option><option>糧油</option><option>罐頭</option><option>調味料</option><option>日用品</option><option>急凍</option><option>其他</option></select>
+          <select id="store" class="w-full h-[48px] rounded-[12px] border px-3 text-[14px] bg-white"><option value="">🏪 店舖</option><option>惠康</option><option>百佳</option><option>萬寧</option><option>屈臣氏</option><option>AEON</option><option>Donki</option><option>HKTVmall</option><option>其他</option></select>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <input id="price" type="number" inputmode="decimal" placeholder="價錢 $" class="h-[48px] rounded-[12px] border px-3 text-[15px] bg-[#fafafa]">
+          <input id="weight" type="number" inputmode="decimal" placeholder="重量" class="h-[48px] rounded-[12px] border px-3 text-[15px] bg-[#fafafa]">
+          <select id="unit" class="h-[48px] rounded-[12px] border px-2 text-[13px] bg-white"><option value="ml">ml</option><option value="g">g</option><option value="kg">kg</option><option value="L">L</option><option value="件">件</option><option value="包">包</option></select>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <label class="relative aspect-[4/3] rounded-[12px] border-2 border-dashed border-purple-300 bg-purple-50 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-purple-100"><input id="file1" type="file" accept="image/*" capture="environment" class="hidden"><div class="text-[20px]">📦</div><div class="text-[10px] font-bold text-purple-700">貨品</div><div class="text-[8px] text-purple-600">DeepSeek最準</div><img id="preview1" class="hidden absolute inset-0 w-full h-full object-cover rounded-[10px]"><button id="remove1" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black text-white text-[10px]">✕</button></label>
+          <label class="relative aspect-[4/3] rounded-[12px] border-2 border-dashed bg-[#fafafa] flex flex-col items-center justify-center gap-1 cursor-pointer"><input id="file2" type="file" accept="image/*" capture="environment" class="hidden"><div class="text-[20px]">💰</div><div class="text-[10px] font-bold">價錢牌</div><div class="text-[8px] text-green-600">本地備援</div><img id="preview2" class="hidden absolute inset-0 w-full h-full object-cover rounded-[10px]"><button id="remove2" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black text-white text-[10px]">✕</button></label>
+          <label class="relative aspect-[4/3] rounded-[12px] border-2 border-dashed border-orange-300 bg-orange-50 flex flex-col items-center justify-center gap-1 cursor-pointer"><input id="file3" type="file" accept="image/*" capture="environment" class="hidden"><div class="text-[20px]">🏷️</div><div class="text-[10px] font-bold text-orange-700">食物標籤</div><img id="preview3" class="hidden absolute inset-0 w-full h-full object-cover rounded-[10px]"><button id="remove3" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-black text-white text-[10px]">✕</button></label>
+        </div>
+
+        <div class="rounded-[14px] border overflow-hidden bg-white">
+          <div class="h-[40px] px-3 flex items-center justify-between bg-[#fafafa] border-b">
+            <div class="flex items-center gap-2"><div class="font-bold text-[11px]">📝 每次掃描原文 (自動貼上)</div><span id="rawCount" class="text-[9px] px-1.5 py-0.5 rounded-full bg-black text-white">0 次</span></div>
+            <div class="flex gap-1"><button id="googleSearchBtn" class="h-7 px-2.5 rounded-full bg-blue-600 text-white text-[10px] font-bold">🌐 Google搜</button><button id="copyRawBtn" class="h-7 px-2.5 rounded-full bg-black text-white text-[10px]">複製</button><button id="clearRawBtn" class="h-7 w-7 rounded-full border bg-white text-[10px]">🗑️</button></div>
+          </div>
+          <textarea id="ocrRawHistory" placeholder="DeepSeek識別最準，文字自動貼呢度，可手動編輯長按複制貼上去上面欄位" class="w-full h-[120px] p-3 text-[12px] font-mono resize-none outline-none"></textarea>
+          <div class="px-3 py-1 bg-[#fafafa] text-[9px] text-neutral-500">DeepSeek最準 · 自動累加 · 可手動編輯 · 長按複制</div>
+        </div>
+
+        <div class="rounded-[14px] border border-purple-100 bg-purple-50/50 overflow-hidden">
+          <div class="h-[36px] px-3 flex items-center justify-between"><div class="font-bold text-[11px] text-purple-900">🔍 今次掃描原文 (DeepSeek)</div><button id="applyCurrentBtn" class="h-6 px-2 rounded-full bg-purple-600 text-white text-[9px]">套用→上面</button></div>
+          <div id="ocrCurrentRaw" class="px-3 pb-2 text-[11px] font-mono min-h-[24px]">未掃描 - 請影相</div>
+          <div id="aiResult" class="px-3 pb-2 text-[10px] hidden"></div>
+        </div>
+
+        <button id="saveBtn" class="w-full h-[52px] rounded-[14px] bg-black text-white font-bold text-[15px]">+ 儲存格價</button>
+        <div class="text-center text-[10px] text-purple-600">DeepSeek最準 · Tesseract免費備援 · Google搜</div>
+      </div>
+    </div>
+  </div>
+  <div class="lg:col-span-7 xl:col-span-8"><div id="productGrid" class="mt-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"></div></div>
+</main>
+<div id="settingsModal" class="fixed inset-0 z-[60] hidden"><div class="absolute inset-0 bg-black/40" id="closeSettings"></div><div class="absolute right-0 top-0 bottom-0 w-[90%] max-w-[380px] bg-white p-5 overflow-y-auto"><div class="flex justify-between mb-5"><div class="font-bold">⚙️ 設定 - v18混合版</div><button id="closeSettings2" class="w-8 h-8 rounded-full bg-neutral-100">✕</button></div>
+<div class="space-y-4">
+<div class="bg-purple-50 border border-purple-200 rounded-[12px] p-3"><div class="font-bold text-[13px] text-purple-800">🧠 DeepSeek (最準，唔使綁卡)</div><div class="text-[11px] mt-1">香港可用，新用戶送500萬字免費。你已有Key已收埋喺Worker。</div><input id="deepseekKey" placeholder="sk-..." class="w-full h-[36px] rounded-[10px] border px-3 text-[11px] font-mono mt-2"><div class="flex gap-2 mt-2"><button id="saveDeepSeek" class="h-8 px-3 rounded-full bg-purple-600 text-white text-[10px]">儲存Key</button><button id="testDeepSeek" class="h-8 px-3 rounded-full border bg-white text-[10px]">測試DeepSeek</button></div><div id="deepSeekStatus" class="mt-2 text-[11px]"></div></div>
+<div class="bg-orange-50 border rounded-[12px] p-3"><div class="font-bold text-[12px]">☁️ Worker (你已有)</div><input id="workerUrl" class="w-full h-[36px] rounded-[10px] border px-3 text-[11px] font-mono mt-2" value="https://hk-price-api.siumeifc1988.workers.dev"><div class="flex gap-2 mt-2"><button id="saveWorkerUrl" class="h-8 px-3 rounded-full bg-orange-600 text-white text-[10px]">儲存</button><button id="testWorker" class="h-8 px-3 rounded-full border bg-white text-[10px]">測試</button></div><div id="workerStatus" class="mt-2 text-[11px]"></div></div>
+<div class="bg-green-50 border rounded-[12px] p-3"><div class="font-bold text-[12px] text-green-800">✓ 免費備援已啟用</div><div class="text-[11px] mt-1">就算無DeepSeek Key，都會自動用本地Tesseract免費OCR，無限用。</div></div>
+</div></div></div>
+<script>
+const WORKER_URL_DEFAULT='https://hk-price-api.siumeifc1988.workers.dev';
+let products=JSON.parse(localStorage.getItem('hk-price-v18')||'[]');
+let currentImages=[null,null,null];
+function toast(m){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='fixed bottom-5 left-1/2 -translate-x-1/2 bg-black text-white px-4 py-2 rounded-full text-[12px] z-[100]';document.body.appendChild(t);}t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+function getWorkerUrl(){return localStorage.getItem('worker_url')||WORKER_URL_DEFAULT;}
+
+async function handleSuccess(data, type){
+  const text=data.raw||'';
+  document.getElementById('ocrCurrentRaw').textContent=text||'無文字';
+  document.getElementById('aiResult').classList.remove('hidden');
+  document.getElementById('aiResult').innerHTML='<div class="flex gap-1 flex-wrap">'+(data.price?'<span class="px-2 py-0.5 rounded-full bg-green-600 text-white text-[10px]">'+data.price+'</span>':'')+(data.weight?'<span class="px-2 py-0.5 rounded-full bg-orange-500 text-white text-[10px]">'+data.weight+'</span>':'')+(data.product?'<span class="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[10px]">'+data.product+'</span>':'')+'<span class="text-[9px] text-neutral-500 ml-1">via '+(data.source||'deepseek')+'</span></div>';
+  if(data.price) document.getElementById('price').value=data.price.replace(/[^0-9.]/g,'');
+  if(data.weight){ const m=data.weight.match(/(\d+\.?\d*)\s*(ml|g|kg|l)/i); if(m){document.getElementById('weight').value=m[1]; document.getElementById('unit').value=m[2].toLowerCase();} }
+  if(data.product && !document.getElementById('productName').value) document.getElementById('productName').value=data.product;
+  const rawEl=document.getElementById('ocrRawHistory'); const ts=new Date().toLocaleTimeString('zh-HK',{hour:'2-digit',minute:'2-digit'}); rawEl.value='['+ts+'] '+type+' ('+(data.source||'')+'):\n'+text+'\n---\n'+rawEl.value; document.getElementById('rawCount').textContent=(rawEl.value.match(/---/g)||[]).length+' 次';
+  document.getElementById('autoStatus').textContent='✅ '+(data.source==='deepseek'?'DeepSeek最準完成':'識別完成'); document.getElementById('autoStatus').className='text-[10px] px-2 py-1 rounded-full bg-green-50 text-green-700';
+  toast('✅ '+(data.product||'完成')+' - '+(data.source||''));
+}
+
+async function recognizeHybrid(base64, type){
+  const wurl=getWorkerUrl();
+  document.getElementById('autoStatus').textContent='🔍 DeepSeek識別中...'; document.getElementById('autoStatus').className='text-[10px] px-2 py-1 rounded-full bg-purple-50 text-purple-700';
+  // 1. 優先用 Worker DeepSeek (最準，Key收埋)
+  try{
+    if(wurl.includes('workers.dev')){
+      const resp=await fetch(wurl+'/api/deepseek',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image: base64})});
+      const data=await resp.json();
+      if(data.success && data.raw){ return handleSuccess(data, type); }
+    }
+  }catch(e){ console.log('Worker DeepSeek fail', e); }
+  // 2. 直接用前端 DeepSeek Key (如果有)
+  const directKey=localStorage.getItem('deepseek_api_key');
+  if(directKey){
+    try{
+      const resp=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+directKey,'Content-Type':'application/json'},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:[{type:'text',text:'你是香港超市價錢牌OCR專家，提取價錢、產品名、重量，用JSON回覆 {"price":"$xx.x","product":"xxx","weight":"xxx","raw":"原文"}'},{type:'image_url',image_url:{url:base64}}]}],max_tokens:800})});
+      const d=await resp.json(); const content=d.choices?.[0]?.message?.content||''; let parsed={}; try{ parsed=JSON.parse(content.match(/\{.*\}/s)[0]); }catch{ parsed={raw:content}; } if(parsed.raw||parsed.product){ return handleSuccess({...parsed, source:'deepseek-direct'}, type); }
+    }catch(e){ console.log('Direct DeepSeek fail', e); }
+  }
+  // 3. 免費備援 Tesseract
+  document.getElementById('autoStatus').textContent='🔍 免費本地備援中...';
+  try{
+    const worker=await Tesseract.createWorker('eng+chi_tra');
+    const ret=await worker.recognize(base64); const text=ret.data.text; await worker.terminate();
+    if(text && text.trim().length>1){ const pm=text.match(/\$\s*(\d+\.?\d*)/); const wm=text.match(/(\d+\s*(?:ml|g|kg|l))/i); return handleSuccess({raw:text, price:pm?.[0]||'', weight:wm?.[0]||'', product:text.split('\n').filter(l=>l.trim().length>2)[0]?.substring(0,30)||'', source:'tesseract-free'}, type); }
+  }catch(e){ console.error(e); }
+  document.getElementById('autoStatus').textContent='❌ 失敗'; document.getElementById('ocrCurrentRaw').textContent='未能識別，可手動喺大格貼文字';
+}
+
+async function searchGoogle(q){ const wurl=getWorkerUrl(); const rawEl=document.getElementById('ocrRawHistory'); if(!q) q=document.getElementById('productName').value.trim(); if(!q){toast('請先有產品名');return;} toast('🌐 搜尋中...'); try{ const res=await fetch(wurl+'/api/google-search?q='+encodeURIComponent(q)); const data=await res.json(); let txt='[Google] '+new Date().toLocaleTimeString()+' "'+q+'"\n'; if(data.items?.length){ data.items.forEach((it,i)=>{txt+=(i+1)+'. '+it.title+'\n   '+it.link+'\n';}); } txt+='---\n'; rawEl.value=txt+rawEl.value; toast('搜到 '+(data.items?.length||0)+' 條'); }catch(e){ window.open('https://www.google.com/search?q='+encodeURIComponent(q+' 香港 價錢'),'_blank'); } }
+
+[1,2,3].forEach(i=>{
+  const fileEl=document.getElementById('file'+i); const pre=document.getElementById('preview'+i); const rem=document.getElementById('remove'+i);
+  fileEl.addEventListener('change', async e=>{ const file=e.target.files[0]; if(!file) return; const r=new FileReader(); r.onload=async ev=>{ const b64=ev.target.result; currentImages[i-1]=b64; pre.src=b64; pre.classList.remove('hidden'); rem.classList.remove('hidden'); await recognizeHybrid(b64, i===1?'貨品':i===2?'價錢牌':'食物標籤'); }; r.readAsDataURL(file); });
+  rem.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); fileEl.value=''; pre.classList.add('hidden'); rem.classList.add('hidden'); currentImages[i-1]=null; });
+});
+
+document.getElementById('googleSearchBtn').addEventListener('click', ()=>searchGoogle());
+document.getElementById('copyRawBtn').addEventListener('click', ()=>{ navigator.clipboard.writeText(document.getElementById('ocrRawHistory').value); toast('已複製'); });
+document.getElementById('clearRawBtn').addEventListener('click', ()=>{ if(confirm('清空？')){ document.getElementById('ocrRawHistory').value=''; document.getElementById('rawCount').textContent='0 次'; }});
+document.getElementById('applyCurrentBtn').addEventListener('click', ()=>{ const cur=document.getElementById('ocrCurrentRaw').textContent; if(cur){ document.getElementById('ocrRawHistory').value=cur+'\n---\n'+document.getElementById('ocrRawHistory').value; toast('已套用'); }});
+document.getElementById('saveBtn').addEventListener('click', ()=>{ const name=document.getElementById('productName').value.trim(); const price=parseFloat(document.getElementById('price').value); if(!name||!price){toast('請填產品名同價錢');return;} const p={id:Date.now(),name,category:document.getElementById('category').value,store:document.getElementById('store').value,price,weight:document.getElementById('weight').value,unit:document.getElementById('unit').value,images:currentImages.filter(Boolean),time:new Date().toLocaleString('zh-HK')}; products.unshift(p); localStorage.setItem('hk-price-v18',JSON.stringify(products)); render(); toast('已儲存'); document.getElementById('productName').value=''; document.getElementById('price').value=''; currentImages=[null,null,null]; [1,2,3].forEach(i=>{document.getElementById('preview'+i).classList.add('hidden');document.getElementById('remove'+i).classList.add('hidden');document.getElementById('file'+i).value='';}); });
+function render(){ const g=document.getElementById('productGrid'); if(!products.length){g.innerHTML='<div class="col-span-full py-12 text-center text-neutral-400">未有格價，影相開始 - DeepSeek最準+免費備援</div>';return;} g.innerHTML=products.map(p=>'<div class="bg-white rounded-[14px] border p-3 flex gap-3"><div class="w-[56px] h-[56px] rounded-[10px] bg-neutral-100 overflow-hidden">'+(p.images?.[0]?'<img src="'+p.images[0]+'" class="w-full h-full object-cover">':'📦')+'</div><div class="flex-1"><div class="font-bold text-[13px]">'+p.name+'</div><div class="font-bold">$'+p.price.toFixed(2)+'</div></div></div>').join(''); } render();
+const modal=document.getElementById('settingsModal'); document.getElementById('settingsBtn').addEventListener('click', ()=>modal.classList.remove('hidden')); document.getElementById('closeSettings').addEventListener('click', ()=>modal.classList.add('hidden')); document.getElementById('closeSettings2').addEventListener('click', ()=>modal.classList.add('hidden'));
+document.getElementById('saveWorkerUrl').addEventListener('click', ()=>{ localStorage.setItem('worker_url', document.getElementById('workerUrl').value.trim()); document.getElementById('workerStatus').textContent='✅ 已儲存'; toast('已儲存'); });
+document.getElementById('testWorker').addEventListener('click', async()=>{ const w=document.getElementById('workerUrl').value.trim(); document.getElementById('workerStatus').textContent='測試中...'; try{ const r=await fetch(w); const t=await r.text(); document.getElementById('workerStatus').textContent=t.includes('運作中')?'✅ 正常':'❌ '+t.slice(0,50); }catch(e){ document.getElementById('workerStatus').textContent='❌ '+e.message; }});
+document.getElementById('saveDeepSeek').addEventListener('click', ()=>{ const k=document.getElementById('deepseekKey').value.trim(); if(k){ localStorage.setItem('deepseek_api_key', k); document.getElementById('deepSeekStatus').textContent='✅ 已儲存到本地'; toast('DeepSeek Key已儲存'); }});
+document.getElementById('testDeepSeek').addEventListener('click', async()=>{ const k=localStorage.getItem('deepseek_api_key')||document.getElementById('deepseekKey').value.trim(); if(!k){ document.getElementById('deepSeekStatus').textContent='❌ 請先填Key'; return; } document.getElementById('deepSeekStatus').textContent='測試中...'; try{ const r=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+k,'Content-Type':'application/json'},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:'hi'}],max_tokens:5})}); const d=await r.json(); document.getElementById('deepSeekStatus').textContent=d.choices?'✅ DeepSeek正常':'❌ '+JSON.stringify(d).slice(0,50); }catch(e){ document.getElementById('deepSeekStatus').textContent='❌ '+e.message; }});
+if(!localStorage.getItem('worker_url')) localStorage.setItem('worker_url', WORKER_URL_DEFAULT);
+</script>
+</body>
+</html>
