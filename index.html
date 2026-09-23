@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>真·格價王 v15 - 全自動連Gemini (無需貼Key)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>html,body{margin:0;padding:0;width:100%;overflow-x:hidden} body{font-family:-apple-system,BlinkMacSystemFont,"PingFang HK","Microsoft JhengHei",sans-serif;background:#FFFEF7} *{box-sizing:border-box}</style>
+<script type="importmap">{"imports":{"firebase/app":"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js","firebase/firestore":"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"}}</script>
+</head>
+<body class="min-h-screen">
+<div class="sticky top-0 z-40 bg-white border-b">
+  <div class="h-[56px] flex items-center justify-between px-4 max-w-[1280px] mx-auto">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center font-black text-[13px]">15</div>
+      <div><div class="font-black text-[15px] leading-[15px]">真·格價王 v15 全自動</div><div class="text-[10px] text-neutral-500 leading-[10px] mt-1">Gemini自動連 · 繁中+英文+數字人眼級</div></div>
+    </div>
+    <div id="syncBadge" class="text-[11px] px-3 py-1.5 rounded-full bg-neutral-100 border">檢查Gemini...</div>
+  </div>
+  <div class="bg-black text-white text-[10px] px-4 py-2 text-center">🤖 v15 全自動連Gemini：上傳即認小島屋 PUI PUI 24.9 42.0/2件 VANILLA 100ML · 無需手動貼Key</div>
+</div>
+
+<div class="max-w-[1280px] mx-auto w-full">
+  <div class="flex flex-col md:flex-row md:items-start md:gap-6 p-3 md:p-6 gap-4">
+    <div class="w-full md:w-[400px] md:shrink-0 md:sticky md:top-[88px] space-y-4 order-1">
+      <div class="bg-white rounded-[20px] border p-4 shadow-sm">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles text-[11px]"></i></div>
+          <div class="font-bold text-[14px]">全自動認字</div>
+          <div id="autoBadge" class="ml-auto text-[10px] px-2 py-1 bg-green-100 text-green-700 rounded-full">Gemini自動</div>
+        </div>
+        <div class="space-y-3">
+          <input id="productName" placeholder="產品名 (自動填 小島屋 PUI PUI...)" class="w-full h-[48px] rounded-[12px] border px-4 text-[14px]">
+          <div class="grid grid-cols-2 gap-2">
+            <select id="category" class="h-[48px] rounded-[12px] border px-3 text-[13px] bg-white"><option value="">🏷️ 種類</option><option value="飲品">🥤 飲品</option><option value="奶類">🥛 奶類</option><option value="罐頭醬料">🥫 罐頭醬料</option><option value="米麵粉">🍚 米麵粉</option><option value="零食">🍪 零食</option><option value="調味料">🧂 調味料</option><option value="冷凍">❄️ 冷凍</option><option value="清潔日用">🧴 清潔日用</option><option value="其他">📦 其他</option></select>
+            <select id="shop" class="h-[48px] rounded-[12px] border px-3 text-[13px] bg-white"><option>惠康</option><option>百佳</option><option>佳寶</option><option>759</option><option>Donki</option><option>HKTVmall</option><option>其他</option></select>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <input id="price" type="number" inputmode="decimal" placeholder="單價 24.9" class="w-full h-[48px] rounded-[12px] border px-4 text-[14px]">
+            <input id="promoPrice" placeholder="促銷 42.0/2件" class="h-[48px] rounded-[12px] border px-3 text-[13px]">
+            <select id="unit" class="h-[48px] rounded-[12px] border px-2 text-[13px] bg-white"><option value="g">g</option><option value="kg">kg</option><option value="ml" selected>ml</option><option value="L">L</option><option value="件">件</option><option value="100ML">100ML</option></select>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="relative"><label for="file1" class="block aspect-square rounded-[14px] border-2 border-dashed bg-neutral-50 cursor-pointer overflow-hidden"><div id="ph1_empty" class="w-full h-full flex flex-col items-center justify-center gap-1.5"><i class="fa-solid fa-camera text-neutral-400 text-[18px]"></i><span class="text-[11px]">自動認</span><span class="text-[7px] text-neutral-400">Gemini</span></div><img id="preview1" class="hidden absolute inset-0 w-full h-full object-cover"><div id="aiOverlay1" class="hidden absolute inset-0 bg-black/80 flex items-center justify-center"><div class="text-white text-[10px] text-center"><i class="fa-solid fa-robot fa-spin"></i><div class="mt-1">Gemini認緊...</div></div></div></label><input id="file1" type="file" accept="image/*" capture="environment" class="hidden"><button id="remove1" class="hidden absolute top-1 right-1 w-6 h-6 bg-black text-white rounded-full text-[12px]">×</button></div>
+            <div class="bg-neutral-50 rounded-[14px] border p-2 flex flex-col justify-center">
+              <div class="text-[9px] text-neutral-500">英文名</div><div id="enName" class="text-[11px] font-bold truncate">KOJIMAYA PUI PUI VANILLA</div>
+              <div class="text-[9px] text-neutral-500 mt-2">容量</div><div id="volDisplay" class="text-[11px] font-bold">100ML</div>
+            </div>
+            <div class="bg-green-50 rounded-[14px] border border-green-200 p-2">
+              <div class="text-[9px] text-green-700">Gemini結果</div><div id="geminiRaw" class="text-[8px] mt-1 whitespace-pre-wrap break-all h-[70px] overflow-y-auto">等待上傳...</div>
+            </div>
+          </div>
+          <button id="addBtn" class="w-full h-[48px] bg-black text-white rounded-[12px] font-black text-[14px]">💾 儲存格價</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-[20px] border p-4 shadow-sm">
+        <div class="font-bold text-[12px] mb-2">📋 每次掃描原文 (自動貼上·人眼級)</div>
+        <textarea id="ocrRawHistory" class="w-full h-[120px] border rounded-[10px] p-2 text-[11px]" placeholder="上傳即自動認：小島屋 PUI PUI 雲呢拿味雪糕杯 24.9 42.0/2件..."></textarea>
+        <div class="flex justify-between mt-2"><span id="rawCount" class="text-[10px] text-neutral-500">0次掃描</span><div class="flex gap-2"><button id="copyRawBtn" class="text-[10px] px-3 py-1 bg-black text-white rounded-full">複製</button><button id="clearRawBtn" class="text-[10px] px-3 py-1 bg-neutral-100 rounded-full">清空</button></div></div>
+      </div>
+    </div>
+
+    <div class="w-full md:flex-1 order-2">
+      <div class="bg-white rounded-[20px] border p-4 shadow-sm">
+        <div class="flex items-center gap-2 mb-3"><div class="font-bold text-[13px]">📦 格價列表</div><div id="listCount" class="text-[10px] px-2 py-1 bg-neutral-100 rounded-full">0件</div></div>
+        <div class="flex gap-2 mb-3"><input id="search" placeholder="搜尋 小島屋..." class="flex-1 h-[36px] border rounded-[10px] px-3 text-[12px]"><select id="sortBy" class="h-[36px] border rounded-[10px] px-2 text-[11px] bg-white"><option value="new">最新</option><option value="cheap">最平/100g</option></select></div>
+        <div id="list" class="space-y-2"></div><div id="empty" class="text-center py-10 text-neutral-400 text-[12px]">未有資料，上傳價錢牌自動開始</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8s5S6v3i4v3a2b1c0d9e8f7g6h5i4j3k2l1m0",
+  authDomain: "hk-price-ai.firebaseapp.com",
+  projectId: "hk-price-ai",
+  storageBucket: "hk-price-ai.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc"
+};
+
+// 自動連Gemini Worker URL
+const WORKER_URL = localStorage.getItem('hk_price_worker_url') || 'https://hk-price-ai.siumeifc1988.workers.dev';
+let db, items=[];
+
+function getKeys(){ return { worker: WORKER_URL }; }
+
+async function checkGemini(){
+  try{
+    const res = await fetch(WORKER_URL + '/api/status');
+    const data = await res.json();
+    const badge = document.getElementById('syncBadge');
+    if(data.gemini){
+      badge.innerHTML = '✅ Gemini已自動連線 v15';
+      badge.className = 'text-[11px] px-3 py-1.5 rounded-full bg-green-100 text-green-700 border border-green-200';
+      document.getElementById('autoBadge').textContent = '✅ 已自動連';
+    } else {
+      badge.innerHTML = '❌ 未設定GEMINI_API_KEY';
+      badge.className = 'text-[11px] px-3 py-1.5 rounded-full bg-red-100 text-red-700 border';
+    }
+  }catch(e){
+    document.getElementById('syncBadge').textContent = '📴 檢查中...';
+  }
+}
+checkGemini();
+
+async function autoRecognizeWithGemini(dataUrl){
+  const overlay = document.getElementById('aiOverlay1');
+  const rawEl = document.getElementById('geminiRaw');
+  overlay.classList.remove('hidden');
+  rawEl.textContent = 'Gemini人眼級認緊...';
+  
+  try{
+    const res = await fetch(WORKER_URL + '/api/auto-ocr', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({image: dataUrl})
+    });
+    const data = await res.json();
+    overlay.classList.add('hidden');
+    
+    if(!data.success){
+      rawEl.textContent = '❌ ' + (data.error||'失敗');
+      return null;
+    }
+    
+    const p = data.parsed || {};
+    rawEl.textContent = data.raw.substring(0,200);
+    
+    // 全自動填表
+    if(p.product_zh) document.getElementById('productName').value = p.product_zh;
+    if(p.single_price) document.getElementById('price').value = parseFloat(p.single_price) || p.single_price;
+    if(p.promo_price) document.getElementById('promoPrice').value = p.promo_price;
+    if(p.volume) document.getElementById('unit').value = p.volume.includes('ML') ? '100ML' : 'ml';
+    if(p.product_en) document.getElementById('enName').textContent = p.product_en;
+    if(p.volume) document.getElementById('volDisplay').textContent = p.volume;
+    
+    // 自動貼上原文
+    const historyEl = document.getElementById('ocrRawHistory');
+    const timestamp = new Date().toLocaleTimeString('zh-HK', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    const entry = `[Gemini自動] ${timestamp}：\n${p.product_zh||''} ${p.product_en||''} ${p.single_price||''} ${p.promo_price||''} ${p.volume||''}\n---\n`;
+    historyEl.value = entry + historyEl.value;
+    document.getElementById('rawCount').textContent = `${(historyEl.value.match(/---/g)||[]).length}次掃描 · 人眼級`;
+    
+    return p;
+  }catch(e){
+    overlay.classList.add('hidden');
+    rawEl.textContent = '❌ ' + e.message;
+    return null;
+  }
+}
+
+function toG(w,u){ w=parseFloat(w)||1; if(u==='kg')return w*1000; if(u==='g')return w; if(u==='ml')return w; if(u==='L')return w*1000; if(u==='100ML')return 100; return w; }
+function per100(p,w,u){ const g=toG(w,u); return g? (p/g*100) : p; }
+
+let temp={};
+async function handleFile(inp){
+  const f = inp.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    const dataUrl = reader.result;
+    temp.b64_1 = dataUrl;
+    document.getElementById('preview1').src = dataUrl;
+    document.getElementById('preview1').classList.remove('hidden');
+    document.getElementById('ph1_empty').classList.add('hidden');
+    document.getElementById('remove1').classList.remove('hidden');
+    await autoRecognizeWithGemini(dataUrl);
+  };
+  reader.readAsDataURL(f);
+}
+
+document.getElementById('file1').onchange = e=>handleFile(e.target);
+document.getElementById('remove1').onclick = (e)=>{ e.preventDefault(); temp={}; document.getElementById('preview1').classList.add('hidden'); document.getElementById('ph1_empty').classList.remove('hidden'); e.currentTarget.classList.add('hidden'); };
+
+document.getElementById('addBtn').onclick = async ()=>{
+  const name=document.getElementById('productName').value.trim();
+  const price=parseFloat(document.getElementById('price').value);
+  if(!name||!price){ alert('請先上傳價錢牌自動認'); return; }
+  const data={product_name:name, price, promo_price: document.getElementById('promoPrice').value, weight:100, unit: document.getElementById('unit').value, weight_g:100, price_per_100g:price, shop: document.getElementById('shop').value, category: document.getElementById('category').value, created_at: serverTimestamp(), image1: temp.b64_1||''};
+  try{ await addDoc(collection(db,'prices'), data); alert('✅ 已儲存'); }catch(e){ alert('儲存失敗：'+e.message); }
+};
+
+document.getElementById('copyRawBtn').onclick = ()=>{ document.getElementById('ocrRawHistory').select(); document.execCommand('copy'); };
+document.getElementById('clearRawBtn').onclick = ()=>{ document.getElementById('ocrRawHistory').value=''; document.getElementById('rawCount').textContent='0次掃描'; };
+
+try{
+  const app=initializeApp(firebaseConfig); db=getFirestore(app);
+  const q=query(collection(db,'prices'), orderBy('created_at','desc'));
+  onSnapshot(q, s=>{ items=s.docs.map(d=>({id:d.id,...d.data()})); document.getElementById('listCount').textContent=`${items.length}件`; render(); });
+}catch(e){ document.getElementById('syncBadge').textContent='📴 本機模式'; }
+
+function render(){
+  const s=document.getElementById('search').value.toLowerCase();
+  let f=items.filter(it=>!s||it.product_name?.toLowerCase().includes(s));
+  if(document.getElementById('sortBy').value==='cheap') f.sort((a,b)=>(a.price_per_100g||999)-(b.price_per_100g||999));
+  const list=document.getElementById('list'); const emp=document.getElementById('empty');
+  if(!f.length){ list.innerHTML=''; emp.classList.remove('hidden'); return; } emp.classList.add('hidden');
+  list.innerHTML=f.map(it=>`<div class="border rounded-[12px] p-3 flex justify-between"><div><div class="font-bold text-[13px]">${it.product_name}</div><div class="text-[11px] text-neutral-500">${it.shop||''} ${it.promo_price||''} ${it.price} </div></div><div class="text-[12px] font-bold">$${it.price}</div></div>`).join('');
+}
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('sortBy').addEventListener('change', render);
+
+// 自動連結 - 如果URL有key就自動存
+(function(){
+  const urlParams = new URLSearchParams(window.location.search);
+  const key = urlParams.get('gemini_key');
+  if(key && key.startsWith('AIza')){
+    localStorage.setItem('gemini_api_key', key);
+    console.log('✅ Gemini已自動連結');
+    history.replaceState(null, '', window.location.pathname + '?v=15-auto');
+  }
+  const worker = urlParams.get('worker');
+  if(worker){
+    localStorage.setItem('hk_price_worker_url', worker);
+  }
+})();
+</script>
+</body>
+</html>
